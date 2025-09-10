@@ -1,0 +1,162 @@
+void automation.historical_provider_data()
+{
+headersMap = Map();
+headersMap.put("Content-Type","application/json");
+payloadMap = Map();
+payloadMap.put("page",1);
+payloadMap.put("per_page",100);
+payloadMap.put("search","john.adewale@yopmail");
+getclient = invokeurl
+[
+	url :"https://wokka.dedicateddevelopers.us/api/front/zoho-api/providers/list"
+	type :POST
+	parameters:payloadMap.toString()
+	headers:headersMap
+];
+data = getclient.getjson("data");
+count = 0;
+for each  client in data
+{
+	if(count >= 10)
+	{
+		break;
+	}
+	//info client;
+	users = client.getjson("users");
+	Address = users.getjson("home_address");
+	info Address;
+	First_App_Login1 = users.getjson("createdAt");
+	if(!First_App_Login1.isNull())
+	{
+		First_App_Login = First_App_Login1.getPrefix("T");
+		info First_App_Login;
+	}
+	Last_App_Login1 = users.getjson("last_login");
+	if(!Last_App_Login1.isNull())
+	{
+		Last_App_Login = Last_App_Login1.getPrefix("T");
+		info Last_App_Login;
+	}
+	bank_accounts = client.getjson("bank_accounts");
+	//info bank_accounts;
+	if(!bank_accounts.isEmpty())
+	{
+		Bank_name = bank_accounts.getjson("bank_name");
+		info Bank_name;
+		Account_Number = bank_accounts.getjson("account_number");
+		Subaccount_Code = bank_accounts.getjson("subaccount_code");
+		Subaccount_id = bank_accounts.getjson("subaccount_id");
+	}
+	partnership = client.getjson("partnership");
+	referral_code = partnership.getjson("referral_code");
+	info referral_code;
+	Agent_name = partnership.getjson("agent_name");
+	task_services = client.getjson("task_services");
+	// 	
+	if(!task_services.isEmpty())
+	{
+		Business_Name = task_services.getjson("service_title");
+		Service_Description = task_services.getjson("service_description");
+		Service_city = task_services.getjson("city");
+		Service_State = task_services.getjson("state");
+		Phone_Number = task_services.getjson("phone");
+		Business_Address = task_services.getjson("business_address");
+		//info Business_Address; 
+		Service_Category = list();
+		Service = task_services.getjson("service_name");
+		//info Service;
+		for each  rec in Service
+		{
+			Service_Category.add(rec);
+		}
+		//info Service_Category;
+	}
+	subscription = client.getjson("subscription");
+	Subscription_Status = subscription.getjson("status");
+	start_date = subscription.getjson("start_date");
+	if(!start_date.isNull())
+	{
+		Subscription_Start = start_date.getPrefix("T");
+	}
+	expiry_date = subscription.getjson("expiry_date");
+	if(!expiry_date.isNull())
+	{
+		Subscription_End = expiry_date.getPrefix("T");
+	}
+	review_ratings = client.getjson("review_ratings");
+	Client_Ratings = review_ratings.getjson("rating_number");
+	info Client_Ratings;
+	first_name = users.getjson("first_name");
+	//info first_name;
+	last_name = users.getjson("last_name");
+	provider_id = users.getjson("_id");
+	NIN = users.getjson("nin_number");
+	//info client_id;
+	full_name = users.getjson("full_name");
+	email = users.getjson("email");
+	City = users.getjson("city");
+	State = users.getjson("state");
+	country = users.getjson("country");
+	gender = users.getjson("gender");
+	Pipeline_Stage = client.getjson("status");
+	//info Pipeline_Stage;
+	Date_of_Birth = users.getjson("dob");
+	if(!Date_of_Birth.isNull())
+	{
+		new_dob = Date_of_Birth.getPrefix("T");
+	}
+	client_map = Map();
+	client_map.put("Bank_Name",Bank_name);
+	//info client_map;
+	client_map.put("Job_Completion_Rates_5_being_the_highest",Client_Ratings.toString());
+	client_map.put("First_App_Login",First_App_Login);
+	client_map.put("Last_App_Login",Last_App_Login);
+	client_map.put("Address",Address);
+	client_map.put("Account_Number",Account_Number);
+	client_map.put("Subaccount_Code",Subaccount_Code);
+	client_map.put("Subaccount_id",Subaccount_id);
+	client_map.put("Service_Description",Service_Description);
+	client_map.put("Service_city",Service_city);
+	client_map.put("Service_State",Service_State);
+	client_map.put("Phone_Number",Phone_Number);
+	client_map.put("Subscription_Status",Subscription_Status);
+	client_map.put("Subscription_Start",Subscription_Start);
+	client_map.put("Subscription_End",Subscription_End);
+	client_map.put("Agent_name",Agent_name);
+	client_map.put("Referral_Code_New",referral_code);
+	client_map.put("Business_Name",Business_Name);
+	client_map.put("Business_Address",Business_Address);
+	client_map.put("Service_Category",Service_Category);
+	client_map.put("Provider_id",provider_id);
+	client_map.put("City",City);
+	client_map.put("Service_Provider_Full_Name",full_name);
+	client_map.put("Name",first_name);
+	client_map.put("Service_Provider_Last_Name",last_name);
+	//info client_map;
+	client_map.put("Email",email);
+	client_map.put("State",State);
+	client_map.put("Country",country);
+	client_map.put("Birth_Gender",gender);
+	client_map.put("NIN",NIN);
+	client_map.put("Date_of_Birth",new_dob);
+	if(Pipeline_Stage == "Suspended")
+	{
+		client_map.put("Pipeline_Stage","Suspended/Inactive");
+	}
+	else if(Pipeline_Stage == "Active")
+	{
+		client_map.put("Pipeline_Stage","Active - Basic");
+	}
+	else if(Pipeline_Stage == "Pending")
+	{
+		client_map.put("Pipeline_Stage","Pending Approval");
+	}
+	client_map.put("Flag",true);
+	//info client_map;
+	// 	update_rec=zoho.crm.updateRecord("Service_Providers",6629635000004085001,client_map);
+	// 	info update_rec;
+	create_rec = zoho.crm.createRecord("Service_Providers",client_map);
+	info create_rec;
+	count = count + 1;
+}
+}
